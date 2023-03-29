@@ -71,13 +71,9 @@ class TurbineLongTermGrossEnergy(object):
         if UQ:
             logger.info("Note: uncertainty quantification will be performed in the calculation")
             self.num_sim = num_sim
-        elif not UQ:
+        else:
             logger.info("Note: uncertainty quantification will NOT be performed in the calculation")
             self.num_sim = None
-        else:
-            raise ValueError(
-                "UQ has to either be True (uncertainty quantification performed, default) or False (uncertainty quantification NOT performed)"
-            )
         self.UQ = UQ
 
         self._plant = plant  # Set plant as attribute of analysis object
@@ -145,7 +141,7 @@ class TurbineLongTermGrossEnergy(object):
 
         # Check uncertainty types
         vars = [wind_bin_thresh, max_power_filter, correction_threshold]
-        expected_type = float if not self.UQ else tuple
+        expected_type = tuple if self.UQ else float
         for var in vars:
             assert (
                 type(var) == expected_type
@@ -571,16 +567,9 @@ class TurbineLongTermGrossEnergy(object):
             plt.xlim(0, 30)
             plt.xlabel("Wind speed (m/s)")
             plt.ylabel("Power (W)")
-            plt.title("Filtered power curve for Turbine %s" % t)
+            plt.title(f"Filtered power curve for Turbine {t}")
             plt.legend(loc="lower right")
-            plt.savefig(
-                "%s/filtered_power_curve_%s.png"
-                % (
-                    save_folder,
-                    t,
-                ),
-                dpi=200,
-            )  # Save file
+            plt.savefig(f"{save_folder}/filtered_power_curve_{t}.png", dpi=200)
 
             # Output figure to terminal if desired
             if output_to_terminal:
@@ -617,16 +606,9 @@ class TurbineLongTermGrossEnergy(object):
             plt.plot(df_imputed["windspeed_ms"], df_imputed["energy_imputed"], ".", label="Imputed")
             plt.xlabel("Wind speed (m/s)")
             plt.ylabel("Daily Energy (kWh)")
-            plt.title("Daily SCADA Energy Fitting, Turbine %s" % t)
+            plt.title(f"Daily SCADA Energy Fitting, Turbine {t}")
             plt.legend(loc="lower right")
-            plt.savefig(
-                "%s/daily_power_curve_%s.png"
-                % (
-                    save_folder,
-                    t,
-                ),
-                dpi=200,
-            )  # Save file
+            plt.savefig(f"{save_folder}/daily_power_curve_{t}.png", dpi=200)
 
             # Output figure to terminal if desired
             if output_to_terminal:

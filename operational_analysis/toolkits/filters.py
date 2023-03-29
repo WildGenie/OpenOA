@@ -20,8 +20,7 @@ def range_flag(data_col, below=-1.0 * np.inf, above=np.inf):
         :obj:`pandas.Series(bool)`: Array-like object with boolean entries.
     """
 
-    flag = ~((data_col <= above) & (data_col >= below))  # Apply the range flag
-    return flag  # Return boolean series of data flags
+    return ~((data_col <= above) & (data_col >= below))
 
 
 def unresponsive_flag(data_col, threshold=3):
@@ -46,7 +45,7 @@ def unresponsive_flag(data_col, threshold=3):
     flag_ind = roll_sum == 0
 
     # Need to flag preceding <threshold> -1 values as well
-    for n in np.arange(threshold - 1):
+    for _ in np.arange(threshold - 1):
         flag_ind = flag_ind | flag_ind.shift(-1)
 
     return flag_ind  # Return boolean series of data flags
@@ -66,11 +65,9 @@ def std_range_flag(data_col, threshold=2.0):
 
     data_mean = data_col.mean()  # Get mean of data
     data_std = data_col.std()  # Get std of data
-    flag = (data_col <= data_mean - threshold * data_std) | (
+    return (data_col <= data_mean - threshold * data_std) | (
         data_col >= data_mean + threshold * data_std
-    )  # Apply the range flag
-
-    return flag
+    )
 
 
 def window_range_flag(window_col, window_start, window_end, value_col, value_min, value_max):
@@ -89,13 +86,11 @@ def window_range_flag(window_col, window_start, window_end, value_col, value_min
         :obj:`pandas.Series(bool)`: Array-like object with boolean entries.
     """
 
-    flag = (
+    return (
         (window_col >= window_start)
         & (window_col <= window_end)
         & ((value_col < value_min) | (value_col > value_max))
     )
-
-    return flag
 
 
 def bin_filter(

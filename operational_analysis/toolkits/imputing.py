@@ -49,7 +49,7 @@ def correlation_matrix_by_id_column(df, align_col, id_col, value_col):
 
 def impute_data(
     target_data, target_value_col, ref_data, ref_value_col, align_col, method="linear"
-):  # ADD LINEAR FUNCTIONALITY AS DEFAULT, expection otherwise
+):    # ADD LINEAR FUNCTIONALITY AS DEFAULT, expection otherwise
     """Replaces NaN data in a target Pandas series with imputed data from a reference Panda series based on a linear
     regression relationship.
 
@@ -92,15 +92,14 @@ def impute_data(
     if reg_df.empty:
         raise Exception("No valid data to build regression relationship")
 
-    if method == "linear":
-        reg = np.polyfit(
-            reg_df[ref_value_col], reg_df[target_value_col], 1
-        )  # Linear regression relationship
-        slope = reg[0]  # Slope
-        intercept = reg[1]  # Intercept
-    else:
+    if method != "linear":
         raise Exception("Only linear regression is currently supported.")
 
+    reg = np.polyfit(
+        reg_df[ref_value_col], reg_df[target_value_col], 1
+    )  # Linear regression relationship
+    slope = reg[0]  # Slope
+    intercept = reg[1]  # Intercept
     # Find timestamps for which input data is NaN and imputing data is real
     impute_df = merge_df.loc[
         (merge_df[target_value_col].isnull()) & np.isfinite(merge_df[ref_value_col])
@@ -149,11 +148,7 @@ def impute_all_assets_by_correlation(
 
     # For efficiency, sort <data> by <id_col> into different dictionary entries immediately
     assets = corr_df.columns
-    asset_dict = {}
-    for a in assets:
-        asset_dict[a] = data.loc[data[id_col] == a]
-
-        # Create imputation series in <data> to be filled, which by default is equal to the original data series
+    asset_dict = {a: data.loc[data[id_col] == a] for a in assets}
     ret = data[[input_col]]
     ret = ret.rename(columns={input_col: "imputed_" + input_col})
 

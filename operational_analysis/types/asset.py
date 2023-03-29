@@ -27,22 +27,26 @@ class AssetData(object):
 
     def load(self, path, name, format="csv"):
         if self._engine == "pandas":
-            self._asset = pd.read_csv("%s/%s.%s" % (path, name, format))
+            self._asset = pd.read_csv(f"{path}/{name}.{format}")
         elif self._engine == "spark":
             self._asset = (
                 self._sqlContext.read.format("com.databricks.spark.csv")
                 .options(header="true", inferschema="true")
-                .load("%s/%s.csv" % (path, name))
+                .load(f"{path}/{name}.csv")
                 .toPandas()
             )
 
     def save(self, path, name, format="csv"):
         if self._engine == "pandas":
-            self._asset.to_csv("%s/%s.%s" % (path, name, format))
+            self._asset.to_csv(f"{path}/{name}.{format}")
         elif self._engine == "spark":
-            self._sqlContext.createDataFrame(self._asset).write.mode("overwrite").format(
-                "com.databricks.spark.csv"
-            ).options(header="true", inferschema="true").save("%s/%s.csv" % (path, name))
+            self._sqlContext.createDataFrame(self._asset).write.mode(
+                "overwrite"
+            ).format("com.databricks.spark.csv").options(
+                header="true", inferschema="true"
+            ).save(
+                f"{path}/{name}.csv"
+            )
 
     def prepare(self, active_turbine_ids, active_tower_ids, srs="epsg:4326"):
         """Prepare the asset data frame for further analysis work. Currently, this function calls parse_geometry(srs)

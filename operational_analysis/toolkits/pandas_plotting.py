@@ -132,11 +132,7 @@ def subplot_powerRose_array(
         (None)
     """
     if columns is None:
-        if len(turbine_ids) > 3:
-            columns = 3
-        else:
-            columns = len(turbine_ids)
-
+        columns = min(len(turbine_ids), 3)
     rows = int(np.ceil(float(len(turbine_ids)) / columns))
 
     if aspect != 1:
@@ -196,7 +192,7 @@ def powerRose_array(project, fig, rect, tid, model_eval, shift=[0], direction=1)
     ax_carthesian.spines["left"].set_color("black")
     ax_carthesian.spines["bottom"].set_visible(True)
     ax_carthesian.spines["bottom"].set_color("black")
-    ax_carthesian.set_title("Turbine %s" % (tid))
+    ax_carthesian.set_title(f"Turbine {tid}")
 
     # the second carthesian axis:
     ax_carthesian_2 = fig.add_axes(rect, frameon=False)
@@ -228,7 +224,7 @@ def powerRose_array(project, fig, rect, tid, model_eval, shift=[0], direction=1)
             (model_eval["winddirection"] * direction + shift[i]) * np.pi / 180,
             model_eval[tid],
             linewidth=3.0,
-            label=str(shift[i]) + " deg",
+            label=f"{str(shift[i])} deg",
         )
 
     ntick = 3
@@ -558,7 +554,7 @@ def turbine_polar_4Dscatter(array, tid, theta, r, color, size, cmap="autumn_r"):
         ax_carthesian.spines["left"].set_color("black")
         ax_carthesian.spines["bottom"].set_visible(True)
         ax_carthesian.spines["bottom"].set_color("black")
-        ax_carthesian.set_title("Turbine %s" % (tid))
+        ax_carthesian.set_title(f"Turbine {tid}")
 
     box = ax_carthesian.get_position()
 
@@ -631,7 +627,7 @@ def turbine_polar_contourf(array, tid, theta, r, c, cmap="autumn_r"):
         ax_carthesian.spines["left"].set_color("black")
         ax_carthesian.spines["bottom"].set_visible(True)
         ax_carthesian.spines["bottom"].set_color("black")
-        ax_carthesian.set_title("Turbine %s" % (tid))
+        ax_carthesian.set_title(f"Turbine {tid}")
 
     return ax_carthesian, ax_polar
 
@@ -711,7 +707,7 @@ def turbine_polar_contour(
         ax_carthesian.spines["left"].set_color("black")
         ax_carthesian.spines["bottom"].set_visible(True)
         ax_carthesian.spines["bottom"].set_color("black")
-        ax_carthesian.set_title("Turbine %s" % (tid))
+        ax_carthesian.set_title(f"Turbine {tid}")
 
     return ax_carthesian, ax_polar, artists, labels
 
@@ -739,9 +735,7 @@ def luminance(rgb):
 
     """
 
-    luminance = (0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2]) / 255
-
-    return luminance
+    return (0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2]) / 255
 
 
 def color_to_rgb(color):
@@ -768,13 +762,12 @@ def color_to_rgb(color):
             (255,0,255)
     """
 
-    if isinstance(color, tuple):
-        if max(color) > 1:
-            color = tuple([i / 255 for i in color])
+    if isinstance(color, tuple) and max(color) > 1:
+        color = tuple(i / 255 for i in color)
 
     rgb = matplotlib.colors.to_rgb(color)
 
-    rgb = tuple([int(i * 255) for i in rgb])
+    rgb = tuple(int(i * 255) for i in rgb)
 
     return rgb
 
@@ -851,7 +844,7 @@ def plot_windfarm(
         "match_aspect": True,
         "tooltips": [("id", "@id"), ("type", "@type"), ("(Lat,Lon)", "@coordinates")],
     }
-    figure_options.update(kwargs_for_figure)
+    figure_options |= kwargs_for_figure
 
     marker_options = {
         "marker": "circle_y",
@@ -861,7 +854,7 @@ def plot_windfarm(
         "line_color": "auto_line_color",
         "legend_group": "type",
     }
-    marker_options.update(kwargs_for_marker)
+    marker_options |= kwargs_for_marker
 
     # Create an appropriate fill color map and contrasting line color
     if marker_options["fill_color"] == "auto_fill_color":
@@ -869,11 +862,11 @@ def plot_windfarm(
 
         assets = assets.sort_values(color_grouping)
 
-        if len(set(assets[color_grouping])) <= 10:
-            color_palette = list(Category10[10])
-        else:
-            color_palette = viridis(len(set(assets[color_grouping])))
-
+        color_palette = (
+            list(Category10[10])
+            if len(set(assets[color_grouping])) <= 10
+            else viridis(len(set(assets[color_grouping])))
+        )
         color_mapping = dict(zip(set(assets[color_grouping]), color_palette))
         assets["auto_fill_color"] = assets[color_grouping].map(color_mapping)
         assets["auto_fill_color"] = assets["auto_fill_color"].apply(color_to_rgb)
@@ -881,18 +874,17 @@ def plot_windfarm(
             "black" if luminance(color) > 0.5 else "white" for color in assets["auto_fill_color"]
         ]
 
-    else:
-        if marker_options["fill_color"] in assets.columns:
-            assets[marker_options["fill_color"]] = assets[marker_options["fill_color"]].apply(
-                color_to_rgb
-            )
-            assets["auto_line_color"] = [
-                "black" if luminance(color) > 0.5 else "white"
-                for color in assets[marker_options["fill_color"]]
-            ]
+    elif marker_options["fill_color"] in assets.columns:
+        assets[marker_options["fill_color"]] = assets[marker_options["fill_color"]].apply(
+            color_to_rgb
+        )
+        assets["auto_line_color"] = [
+            "black" if luminance(color) > 0.5 else "white"
+            for color in assets[marker_options["fill_color"]]
+        ]
 
-        else:
-            assets["auto_line_color"] = "black"
+    else:
+        assets["auto_line_color"] = "black"
 
     # Create the bokeh data source
     source = ColumnDataSource(assets)

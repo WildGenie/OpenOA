@@ -43,10 +43,7 @@ def fit_parametric_power_curve(
         return curve(x_2, *fit.x)
 
     # Return values based on flag
-    if return_params:
-        return lambda x_2: fit_curve, fit
-    else:
-        return fit_curve
+    return (lambda x_2: fit_curve, fit) if return_params else fit_curve
 
 
 """

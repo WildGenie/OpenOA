@@ -38,9 +38,7 @@ def convert_local_to_utc(d, tz_string):
     tz = timezone(tz_string)  # define timezone
     d_local = tz.localize(d_obj, is_dst=True)  # localize the date object
     utc = timezone("UTC")  # define UTC timezone
-    d_utc = d_local.astimezone(utc)  # calculate UTC time
-
-    return d_utc
+    return d_local.astimezone(utc)
 
 
 def find_time_gaps(t_series, freq):
@@ -65,11 +63,7 @@ def find_time_gaps(t_series, freq):
         data=pd.date_range(t_series.min(), end=t_series.max(), freq=freq)
     )  # Full range of timestamps
 
-    # Find missing time stamps by concatenating full timestamps and actual and removing duplicates
-    # What remains is those timestamps not found in the data
-    missing_dt = (pd.concat([range_dt, t_series])).drop_duplicates(keep=False)
-
-    return missing_dt
+    return (pd.concat([range_dt, t_series])).drop_duplicates(keep=False)
 
 
 def find_duplicate_times(t_series, freq):
@@ -87,9 +81,7 @@ def find_duplicate_times(t_series, freq):
     # Convert 't_series' to Pandas series in case a time index is passed
     t_series = pd.Series(t_series)
 
-    repeated_steps = t_series[t_series.duplicated()]
-
-    return repeated_steps
+    return t_series[t_series.duplicated()]
 
 
 def gap_fill_data_frame(df, time_col, freq):
@@ -126,11 +118,7 @@ def percent_nan(s):
     Returns:
         :obj:`float`: Percentage of NaN data in the data series
     """
-    if len(s) > 0:
-        perc = np.float64((s.isnull().sum())) / np.float64(len(s))
-    else:
-        perc = 1
-    return perc
+    return np.float64((s.isnull().sum())) / np.float64(len(s)) if len(s) > 0 else 1
 
 
 def num_days(s):
@@ -143,9 +131,7 @@ def num_days(s):
     Returns:
         :obj:`int`: Number of days in the data
     """
-    n_days = len(s.resample("D"))
-
-    return n_days
+    return len(s.resample("D"))
 
 
 def num_hours(s):
@@ -157,6 +143,4 @@ def num_hours(s):
     Returns:
         :obj:`int`: Number of hours in the data
     """
-    n_hours = len(s.resample("H"))
-
-    return n_hours
+    return len(s.resample("H"))

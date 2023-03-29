@@ -54,13 +54,9 @@ class ElectricalLosses(object):
         if UQ:
             logger.info("Note: uncertainty quantification will be performed in the calculation")
             self.num_sim = num_sim
-        elif not UQ:
+        else:
             logger.info("Note: uncertainty quantification will NOT be performed in the calculation")
             self.num_sim = 1
-        else:
-            raise ValueError(
-                "UQ has to either be True (uncertainty quantification performed, default) or False (uncertainty quantification NOT performed)"
-            )
         self.UQ = UQ
 
         self._plant = plant
@@ -86,7 +82,7 @@ class ElectricalLosses(object):
             (None)
         """
         # Define uncertainties and check types
-        expected_type = float if not self.UQ else tuple
+        expected_type = tuple if self.UQ else float
         assert (
             type(uncertainty_correction_thresh) == expected_type
         ), f"uncertainty_correction_thresh must be {expected_type} for UQ={self.UQ}"

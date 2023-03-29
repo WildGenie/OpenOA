@@ -30,9 +30,7 @@ def _read_data(data: Union[pd.DataFrame, str]) -> pd.DataFrame:
     Returns
      (:obj: `pd.DataFrame`): The data fram object.
     """
-    if isinstance(data, pd.DataFrame):
-        return data
-    return pd.read_csv(data)
+    return data if isinstance(data, pd.DataFrame) else pd.read_csv(data)
 
 
 def _remove_tz(df: pd.DataFrame, t_local_column: str) -> Tuple[np.ndarray, np.ndarray]:
@@ -53,10 +51,10 @@ def _remove_tz(df: pd.DataFrame, t_local_column: str) -> Tuple[np.ndarray, np.nd
     """
     arr = np.array(
         [
-            [True, pd.to_datetime(el).tz_localize(None).to_pydatetime()]
-            if not isinstance(el, float)
-            else [False, np.nan]
-            for ix, el in enumerate(df.loc[:, t_local_column])
+            [False, np.nan]
+            if isinstance(el, float)
+            else [True, pd.to_datetime(el).tz_localize(None).to_pydatetime()]
+            for el in df.loc[:, t_local_column]
         ]
     )
     ix_filter = arr[:, 0].astype(bool)
@@ -656,7 +654,7 @@ class WindToolKitQualityControlDiagnosticSuite(QualityControlDiagnosticSuite):
 
         # Setup date and time
         dt = f["datetime"]
-        dt = pd.DataFrame({"datetime": dt[:]}, index=range(0, dt.shape[0]))
+        dt = pd.DataFrame({"datetime": dt[:]}, index=range(dt.shape[0]))
         dt["datetime"] = dt["datetime"].apply(dateutil.parser.parse)
 
         project_idx = self.indicesForCoord(f)
@@ -667,9 +665,9 @@ class WindToolKitQualityControlDiagnosticSuite(QualityControlDiagnosticSuite):
             message = "Project coordinates are outside of the WIND Toolkit domain; aborting diurnal methods!"
             raise IndexError(message)
 
-        print("y,x indices for project: \t\t {}".format(project_idx))
-        print("Coordinates of project: \t {}".format(self._lat_lon))
-        print("Coordinates of project: \t {}".format(coordinates))
+        print(f"y,x indices for project: \t\t {project_idx}")
+        print(f"Coordinates of project: \t {self._lat_lon}")
+        print(f"Coordinates of project: \t {coordinates}")
 
         # Get wind speed at 80m from the specified lat/lon
         ws = f["windspeed_80m"]

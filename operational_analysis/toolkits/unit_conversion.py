@@ -17,8 +17,7 @@ def convert_power_to_energy(power_col, sample_rate_min="10T"):
 
     """
     time_conversion = {"1T": 1.0, "5T": 5.0, "10T": 10.0, "30T": 30.0, "1H": 60.0}
-    energy_kwh = power_col * time_conversion[sample_rate_min] / 60.0
-    return energy_kwh
+    return power_col * time_conversion[sample_rate_min] / 60.0
 
 
 def compute_gross_energy(
@@ -70,6 +69,4 @@ def convert_feet_to_meter(variable):
         :obj:`pandas.Series`: variable in meters of the input data frame 'df'
     """
 
-    out = variable * 0.3048
-
-    return out
+    return variable * 0.3048

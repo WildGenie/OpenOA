@@ -221,7 +221,7 @@ class MonteCarloAEP(object):
             "reanal_subset",
         ]
         logged_params = {name: getattr(self, name) for name in logged_self_params}
-        logger.info("Running with parameters: {}".format(logged_params))
+        logger.info(f"Running with parameters: {logged_params}")
 
         # Start the computation
         self.calculate_long_term_losses()
@@ -465,7 +465,7 @@ class MonteCarloAEP(object):
         tmp_df.boxplot(column="aep", by="param", figsize=(8, 6))
         plt.ylabel("AEP (GWh/yr)")
         plt.xlabel(lab)
-        plt.title("AEP estimates by %s" % lab)
+        plt.title(f"AEP estimates by {lab}")
         plt.suptitle("")
         plt.tight_layout()
         return plt
@@ -551,7 +551,7 @@ class MonteCarloAEP(object):
 
         # Drop any data that have NaN gross energy values or NaN reanalysis data
         self._aggregate.df = self._aggregate.df.dropna(
-            subset=["gross_energy_gwh"] + [product for product in self._reanal_products]
+            subset=["gross_energy_gwh"] + list(self._reanal_products)
         )
 
     @logged_method_call
@@ -687,10 +687,12 @@ class MonteCarloAEP(object):
         # Identify start and end dates for long-term correction
         # First find date range common to all reanalysis products and drop minute field of start date
         start_date = max(
-            [self._plant._reanalysis._product[key].df.index.min() for key in self._reanal_products]
+            self._plant._reanalysis._product[key].df.index.min()
+            for key in self._reanal_products
         ).replace(minute=0)
         end_date = min(
-            [self._plant._reanalysis._product[key].df.index.max() for key in self._reanal_products]
+            self._plant._reanalysis._product[key].df.index.max()
+            for key in self._reanal_products
         )
 
         # Next, update the start date to make sure it corresponds to a full time period
@@ -724,10 +726,8 @@ class MonteCarloAEP(object):
             else:
                 # replace end date
                 end_date = self.end_date_lt
-        else:
-            # If not at the end of a month, use the end of the previous month as the end date
-            if end_date.month == (end_date + pd.DateOffset(hours=1)).month:
-                end_date = end_date.replace(day=1, hour=0, minute=0) - pd.DateOffset(hours=1)
+        elif end_date.month == (end_date + pd.DateOffset(hours=1)).month:
+            end_date = end_date.replace(day=1, hour=0, minute=0) - pd.DateOffset(hours=1)
 
         # Define empty data frame that spans our period of interest
         self._reanalysis_aggregate = pd.DataFrame(
@@ -893,9 +893,7 @@ class MonteCarloAEP(object):
 
         # Check if valid data has already been calculated and stored. If so, just return it
         if (reanal, self._run.loss_threshold) in self.outlier_filtering:
-            valid_data = self.outlier_filtering[(reanal, self._run.loss_threshold)]
-            return valid_data
-
+            return self.outlier_filtering[(reanal, self._run.loss_threshold)]
         # If valid data hasn't yet been stored in dictionary, determine the valid data
         df = self._aggregate.df
 
@@ -1145,9 +1143,9 @@ class MonteCarloAEP(object):
 
         num_vars = 1
         if self.reg_winddirection:
-            num_vars = num_vars + 2
+            num_vars += 2
         if self.reg_temperature:
-            num_vars = num_vars + 1
+            num_vars += 1
 
         if self.reg_model == "lin":
             self._mc_intercept = np.empty(num_sim, dtype=np.float64)
@@ -1236,8 +1234,7 @@ class MonteCarloAEP(object):
         aep_GWh = aep_GWh * iav_nsim
         lt_por_ratio = lt_por_ratio * iav_nsim
 
-        # Return final output
-        sim_results = pd.DataFrame(
+        return pd.DataFrame(
             index=np.arange(num_sim),
             data={
                 "aep_GWh": aep_GWh,
@@ -1250,7 +1247,6 @@ class MonteCarloAEP(object):
                 "iav": iav,
             },
         )
-        return sim_results
 
     @logged_method_call
     def sample_long_term_reanalysis(self):

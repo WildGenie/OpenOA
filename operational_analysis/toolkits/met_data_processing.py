@@ -80,12 +80,12 @@ def compute_air_density(temp_col, pres_col, humi_col=None):
 
     R_const = 287.05  # Gas constant for dry air, units of J/kg/K
     Rw_const = 461.5  # Gas constant of water vapour, unit J/kg/K
-    rho = (1 / temp_col) * (
+    return (1 / temp_col) * (
         pres_col / R_const
-        - rel_humidity * (0.0000205 * np.exp(0.0631846 * temp_col)) * (1 / R_const - 1 / Rw_const)
+        - rel_humidity
+        * (0.0000205 * np.exp(0.0631846 * temp_col))
+        * (1 / R_const - 1 / Rw_const)
     )
-
-    return rho
 
 
 def pressure_vertical_extrapolation(p0, temp_avg, z0, z1):
@@ -107,9 +107,7 @@ def pressure_vertical_extrapolation(p0, temp_avg, z0, z1):
         raise Exception("Some of your temperature of pressure data is negative. Check your data")
 
     R_const = 287.058  # Gas constant for dry air, units of J/kg/K
-    p1 = p0 * np.exp(-const.g * (z1 - z0) / R_const / temp_avg)  # Pressure at z1
-
-    return p1
+    return p0 * np.exp(-const.g * (z1 - z0) / R_const / temp_avg)
 
 
 def air_density_adjusted_wind_speed(wind_col, density_col):
@@ -124,11 +122,7 @@ def air_density_adjusted_wind_speed(wind_col, density_col):
         :obj:`pandas.Series`: density-adjusted wind speeds; units of m/s
     """
     rho_mean = density_col.mean()  # Mean air density across sample
-    dens_adjusted_ws = wind_col * np.power(
-        density_col / rho_mean, 1.0 / 3
-    )  # Density adjusted wind speeds
-
-    return dens_adjusted_ws
+    return wind_col * np.power(density_col / rho_mean, 1.0 / 3)
 
 
 def compute_turbulence_intensity(mean_col, std_col):

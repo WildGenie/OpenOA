@@ -195,23 +195,19 @@ class EYAGapAnalysis(object):
         neg_offset = mx / 25
         pos_offset = mx / 50
 
-        # Add labels to each bar
-        loop = 0
-        for index, row in trans.iterrows():
+        for loop, (index, row) in enumerate(trans.iterrows()):
             # For the last item in the list, we don't want to double count
-            if row["amount"] == total:
-                y = y_height[loop]
-            else:
-                y = y_height[loop] + row["amount"]
-
+            y = (
+                y_height[loop]
+                if row["amount"] == total
+                else y_height[loop] + row["amount"]
+            )
             # Determine if we want a neg or pos offset
             if row["amount"] > 0:
                 y += pos_offset
             else:
                 y -= neg_offset
             my_plot.annotate("{:,.0f}".format(row["amount"]), (loop, y), ha="center")
-            loop += 1
-
         # Adjust y-axis to focus on region of interest
         plt_min = blank[1:-1].min()  # Min value in cumulative sum values
         plt_max = blank[1:].max()  # Min value in cumulative sum values
