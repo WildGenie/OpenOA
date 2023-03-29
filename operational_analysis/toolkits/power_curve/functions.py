@@ -37,7 +37,7 @@ def IEC(windspeed_column, power_column, bin_width=0.5, windspeed_start=0, windsp
     P_bin = np.ones(len(bins) - 1) * np.nan
 
     # Compute the mean of each bin and set corresponding P_bin
-    for ibin in range(0, len(bins) - 1):
+    for ibin in range(len(bins) - 1):
         indices = (windspeed_column >= bins[ibin]) & (windspeed_column < bins[ibin + 1])
         P_bin[ibin] = power_column.loc[indices].mean()
 
@@ -47,7 +47,7 @@ def IEC(windspeed_column, power_column, bin_width=0.5, windspeed_start=0, windsp
     # Create a closure over the computed bins which computes the power curve value for arbitrary array-like input
     def pc_iec(x):
         P = np.zeros(np.shape(x))
-        for i in range(0, len(bins) - 1):
+        for i in range(len(bins) - 1):
             idx = np.where((x >= bins[i]) & (x < bins[i + 1]))
             P[idx] = P_bin[i]
         cutoff_idx = (x < windspeed_start) | (x > windspeed_end)

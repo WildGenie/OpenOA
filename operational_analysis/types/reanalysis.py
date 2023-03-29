@@ -58,9 +58,9 @@ class ReanalysisData(object):
         if self._engine == "pandas":
             if format == "csv":
                 for product in self._products:
-                    self._product[product].load(path, "{}_{}".format(name, product))
+                    self._product[product].load(path, f"{name}_{product}")
             elif format == "planetos":
-                for product in list(set(self._products) & set(("merra2", "era5"))):
+                for product in list(set(self._products) & {"merra2", "era5"}):
                     # Download from PlanetOS if csv file doesn't already exist
                     if not (Path(path) / f"{name}_{product}.csv").exists():
                         reanalysis_downloading.download_reanalysis_data_planetos(
@@ -73,7 +73,7 @@ class ReanalysisData(object):
                             **kwargs,
                         )
 
-                    self._product[product].load(path, "{}_{}".format(name, product))
+                    self._product[product].load(path, f"{name}_{product}")
             else:
                 raise NotImplementedError(
                     'Not a valid format. Allowable formats are "csv" and "planetos".'
@@ -135,7 +135,7 @@ class ReanalysisData(object):
     def save(self, path, name):
         if self._engine == "pandas":
             for product, table in self._product.items():
-                table.save(path, "{}_{}".format(name, product))
+                table.save(path, f"{name}_{product}")
 
         if self._engine == "spark":
             raise NotImplementedError("Spark version of this function is not yet implemented")

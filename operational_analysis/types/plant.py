@@ -51,7 +51,7 @@ class PlantData(object):
         """
         if not schema:
             dir = os.path.dirname(os.path.abspath(__file__))
-            schema = dir + "/plant_schema.json"
+            schema = f"{dir}/plant_schema.json"
         with open(schema) as schema_file:
             self._schema = json.load(schema_file)
 
@@ -94,7 +94,7 @@ class PlantData(object):
             New data field standard
         """
 
-        k = "_%s_std" % (dfname,)
+        k = f"_{dfname}_std"
         setattr(
             self, k, dict(itertools.chain(iter(getattr(self, k).items()), iter(new_fields.items())))
         )
@@ -186,7 +186,7 @@ class PlantData(object):
 
         for field in schema["fields"]:
             if field["type"] == "timeseries":
-                attr = "_{}".format(field["name"])
+                attr = f'_{field["name"]}'
                 if not getattr(self, attr).is_empty():
                     getattr(self, attr).validate(field)
 

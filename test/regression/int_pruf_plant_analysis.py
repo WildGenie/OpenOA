@@ -75,10 +75,10 @@ class TestPandasPrufPlantAnalysis(unittest.TestCase):
         expected = {"merra2": [7.584891, 8.679547], "era5": [7.241081, 8.188632]}
         computed = {
             key: df_rean.loc[[df_rean.index[0], df_rean.index[-1]], key].to_numpy()
-            for key in expected.keys()
+            for key in expected
         }
 
-        for key in expected.keys():
+        for key in expected:
             nptest.assert_array_almost_equal(expected[key], computed[key])
 
         # ____________________________________________________________________
@@ -121,10 +121,10 @@ class TestPandasPrufPlantAnalysis(unittest.TestCase):
         expected = {"merra2": [7.584891, 6.529796], "era5": [7.241081, 6.644804]}
         computed = {
             key: df_rean.loc[[df_rean.index[0], df_rean.index[-1]], key].to_numpy()
-            for key in expected.keys()
+            for key in expected
         }
 
-        for key in expected.keys():
+        for key in expected:
             nptest.assert_array_almost_equal(expected[key], computed[key])
 
     def test_reanalysis_aggregate_daily(self):
@@ -146,10 +146,10 @@ class TestPandasPrufPlantAnalysis(unittest.TestCase):
         expected = {"merra2": [12.868168, 5.152958], "era5": [12.461761, 5.238968]}
         computed = {
             key: df_rean.loc[[df_rean.index[0], df_rean.index[-1]], key].to_numpy()
-            for key in expected.keys()
+            for key in expected
         }
 
-        for key in expected.keys():
+        for key in expected:
             nptest.assert_array_almost_equal(expected[key], computed[key])
 
         # ____________________________________________________________________
@@ -192,10 +192,10 @@ class TestPandasPrufPlantAnalysis(unittest.TestCase):
         expected = {"merra2": [12.868168, 14.571084], "era5": [12.461761, 14.045798]}
         computed = {
             key: df_rean.loc[[df_rean.index[0], df_rean.index[-1]], key].to_numpy()
-            for key in expected.keys()
+            for key in expected
         }
 
-        for key in expected.keys():
+        for key in expected:
             nptest.assert_array_almost_equal(expected[key], computed[key])
 
     def test_reanalysis_aggregate_hourly(self):
@@ -217,10 +217,10 @@ class TestPandasPrufPlantAnalysis(unittest.TestCase):
         expected = {"merra2": [10.509840, 9.096710], "era5": [9.202639, 9.486806]}
         computed = {
             key: df_rean.loc[[df_rean.index[0], df_rean.index[-1]], key].to_numpy()
-            for key in expected.keys()
+            for key in expected
         }
 
-        for key in expected.keys():
+        for key in expected:
             nptest.assert_array_almost_equal(expected[key], computed[key])
 
         # ____________________________________________________________________
@@ -263,10 +263,10 @@ class TestPandasPrufPlantAnalysis(unittest.TestCase):
         expected = {"merra2": [10.509840, 16.985526], "era5": [9.202639, 15.608469]}
         computed = {
             key: df_rean.loc[[df_rean.index[0], df_rean.index[-1]], key].to_numpy()
-            for key in expected.keys()
+            for key in expected
         }
 
-        for key in expected.keys():
+        for key in expected:
             nptest.assert_array_almost_equal(expected[key], computed[key])
 
     def test_monthly_lin(self):
@@ -419,11 +419,11 @@ class TestPandasPrufPlantAnalysis(unittest.TestCase):
         }
 
         date_ind = pd.to_datetime(["2014-06-01", "2014-12-01", "2015-10-01"])
-        computed = {key: df.loc[date_ind, key].to_numpy() for key in expected.keys()}
+        computed = {key: df.loc[date_ind, key].to_numpy() for key in expected}
 
         print(computed)
 
-        for key in expected.keys():
+        for key in expected:
             nptest.assert_array_almost_equal(expected[key], computed[key])
 
         # check that date range is truncated correctly
@@ -474,11 +474,11 @@ class TestPandasPrufPlantAnalysis(unittest.TestCase):
         }
 
         date_ind = pd.to_datetime(["2014-01-02", "2014-10-12", "2015-12-28"])
-        computed = {key: df.loc[date_ind, key].to_numpy() for key in expected.keys()}
+        computed = {key: df.loc[date_ind, key].to_numpy() for key in expected}
 
         print(computed)
 
-        for key in expected.keys():
+        for key in expected:
             nptest.assert_array_almost_equal(expected[key], computed[key])
 
     def check_simulation_results_lin_monthly(self, s):

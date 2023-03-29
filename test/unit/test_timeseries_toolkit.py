@@ -138,14 +138,13 @@ class SimpleTimeseriesTests(unittest.TestCase):
         self.assertEqual(num, 32 * 24, "Two days of data separated by a month...")
 
     def test_percent_nan(self):
-        test_dict = {}
-        test_dict["a"] = pd.Series(["", 1, 2, 1e5, np.Inf])
+        test_dict = {"a": pd.Series(["", 1, 2, 1e5, np.Inf])}
         test_dict["b"] = pd.Series(["", np.nan, 2, 1e5, np.Inf])
         test_dict["c"] = pd.Series([np.nan, 1, 2, 1e5, np.nan])
 
         nan_values = {"a": 0.0, "b": 0.2, "c": 0.4}
 
-        for a, b in test_dict.items():
+        for a in test_dict:
             nptest.assert_almost_equal(
                 nan_values[a],
                 timeseries.percent_nan(test_dict[a]),

@@ -84,7 +84,9 @@ def fetch_eia(api_key, plant_id, file_path):
 
     api = eia.API(api_key)  # get data from EIA
 
-    series_search_m = api.data_by_series(series="ELEC.PLANT.GEN.%s-ALL-ALL.M" % plant_id)
+    series_search_m = api.data_by_series(
+        series=f"ELEC.PLANT.GEN.{plant_id}-ALL-ALL.M"
+    )
     eia_monthly = pd.DataFrame(series_search_m)  # net monthly energy generation of wind farm in MWh
     eia_monthly.columns = ["eia_monthly_mwh"]  # rename column
     eia_monthly = eia_monthly.set_index(
@@ -108,10 +110,7 @@ def add_eia_meta_to_project(project, api_key, plant_id, file_path):
         (None)
     """
 
-    project._eia = {}
-    project._eia["api_key"] = api_key
-    project._eia["data_dir"] = file_path
-    project._eia["eia_id"] = plant_id
+    project._eia = {"api_key": api_key, "data_dir": file_path, "eia_id": plant_id}
     project._eia["monthly_energy"], project._eia["meta_data"] = fetch_eia(
         api_key, plant_id, file_path
     )

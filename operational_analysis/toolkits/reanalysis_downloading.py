@@ -143,7 +143,7 @@ def _get_start_end_dates_planetos(start_date, end_date, num_years, start_date_ds
 
         # Check to see if start date is out of bounds for the dataset
         if start_date_new < start_date_ds:
-            print("Start date is out of range. Changing to " + str(start_date_ds))
+            print(f"Start date is out of range. Changing to {str(start_date_ds)}")
             start_date_new = start_date_ds
 
         # Handle rare leap year case where start date is on the last day of February
@@ -159,7 +159,7 @@ def _get_start_end_dates_planetos(start_date, end_date, num_years, start_date_ds
 
         # Check to see if end date is out of bounds for the dataset
         if (end_date_new - datetime.timedelta(hours=1)) > end_date_ds:
-            print("End date is out of range. Changing to " + str(end_date_ds))
+            print(f"End date is out of range. Changing to {str(end_date_ds)}")
             end_date_new = end_date_ds + datetime.timedelta(hours=1)
 
         # Handle rare leap year case where end date is on the last day of February
@@ -184,14 +184,14 @@ def _get_start_end_dates_planetos(start_date, end_date, num_years, start_date_ds
 
     # Check once more to see if start and end dates are out of bounds for the dataset
     if start_date_new < start_date_ds:
-        print("Start date is out of range. Changing to " + str(start_date_ds))
+        print(f"Start date is out of range. Changing to {str(start_date_ds)}")
         start_date_new = start_date_ds
 
         # If start date minute changes, update end date too
         end_date_new = end_date_new.replace(minute=start_date_new.minute)
 
     if (end_date_new - datetime.timedelta(hours=1)) > end_date_ds:
-        print("End date is out of range. Changing to " + str(end_date_ds))
+        print(f"End date is out of range. Changing to {str(end_date_ds)}")
         end_date_new = end_date_ds + datetime.timedelta(hours=1)
 
     # Now check to see if both the start and end dates happen to be out of bounds
@@ -373,7 +373,7 @@ def download_reanalysis_data_planetos(
         "time_end": end_date.strftime("%Y-%m-%dT%H:%M:%S"),
     }
 
-    r = requests.get(url, params={**base_kwargs, **api_kwargs})
+    r = requests.get(url, params=base_kwargs | api_kwargs)
 
     # convert to standard dataframe
     df = _convert_resp_to_df(r, var_names, var_dict)
